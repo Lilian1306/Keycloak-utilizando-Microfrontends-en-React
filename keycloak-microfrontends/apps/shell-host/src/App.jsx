@@ -1,7 +1,8 @@
 import { Suspense, lazy, useState } from "react";
 import keycloak from "../keycloak.js";
 
-const UserList = lazy(() => import('mfeUserList/UserList'))
+const UserList = lazy(() => import('mfeUserList/UserList'));
+const UserForm = lazy(() => import('mfeUserForm/UserForm'));
 
 
 export default function App({token}) {
@@ -26,9 +27,18 @@ export default function App({token}) {
         )
         case 'create-user':
           return (
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-2xl font-semibold text-gray-800 mb-4">Crear Usuario</h2>
-              <p className="text-gray-600">Funcionalidad proximamente</p>
+            <Suspense fallback={ <div className="text-center p-10">Cargando Formulario</div> }>
+            <UserForm
+              token={token}
+              onSucess={() => setCurrentView('users') }
+            />
+            </Suspense>
+          )
+          default: 
+          return (
+            <div className="bg-white p-6 rounded-lg shadow">
+              <h2 className="text-xl font-bold">Bienvenido</h2>
+              <p>Seleccione una opcion del menu para comenzar.</p>
             </div>
           )
        
@@ -76,7 +86,7 @@ export default function App({token}) {
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
             }`}
           >
-            Crear Usuario
+            Crear varios usuarios
           </button>
         </div>
       </nav>

@@ -20,7 +20,7 @@ export default function useUser({token}) {
         } finally {
             setLoading(false);
         }
-    }, [token]);
+    }, [token, API_URL]);
 
     const deleteUser = async (userId) => {
         try {

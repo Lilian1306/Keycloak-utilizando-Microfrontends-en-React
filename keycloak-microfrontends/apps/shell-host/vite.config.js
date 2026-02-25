@@ -11,11 +11,17 @@ export default defineConfig({
       name: 'shell_host',
       remotes: {
         mfeUserList: 'http://localhost:5174/assets/remoteEntry.js',
+        mfeUserForm: 'http://localhost:5175/assets/remoteEntry.js',
       },
       shared: ['react', 'react-dom'],
     }),
   ],
   server: {
     port: 5173,
+  },
+   build: {
+    target: 'esnext',
+    minify: false,
+    cssCodeSplit: false,
   }
 });
