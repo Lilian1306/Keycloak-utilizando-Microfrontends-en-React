@@ -2,6 +2,7 @@ import { useState } from 'react';
 import EditUserForm from './EditUserForm';
 import DeleteModal from './DeleteModal';
 import useUser from '../hooks/useUser';
+import { toast } from 'react-toastify'
 
 export default function UserTable({ users, token, onUserUpdated }) {
   const [editingUser, setEditingUser] = useState(null);
@@ -35,16 +36,19 @@ export default function UserTable({ users, token, onUserUpdated }) {
   };
 
   const handleDeleteConfirm = async () => {
-    if (deletingUser) {
+    if(deletingUser){
       const result = await deleteUser(deletingUser.id);
-      if (result) {
+      if(result) {
         setDeletingUser(null);
+        toast.success("Usuario eliminado correctamente");
         if (onUserUpdated) {
-          onUserUpdated();
-        }
+        onUserUpdated();
       }
+      } else {
+      toast.error("No se pudo eliminar al usuario"); 
+    } 
     }
-  };
+  }
 
   const handleDeleteCancel = () => {
     setDeletingUser(null);

@@ -1,3 +1,4 @@
+
 export default function DeleteModal({ user, onConfirm, onCancel, isLoading }) {
   if (!user) return null;
 

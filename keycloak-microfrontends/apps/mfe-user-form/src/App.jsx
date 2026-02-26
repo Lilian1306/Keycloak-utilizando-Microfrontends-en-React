@@ -1,6 +1,6 @@
 
 import UserForm from './components/UserForm';
-import {ToastContainer } from 'react-toastify'
+import {ToastContainer } from 'react-toastify';
 
 export default function App({ token, onSucess }) { 
   if (!token) {
