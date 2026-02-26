@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import UserTable from './components/UserTable';
 import { KEYCLOAK_CONFIG } from './config';
+import {ToastContainer } from 'react-toastify';
 
 export default function App({ token }) {
   const [users, setUsers] = useState([]);
@@ -76,6 +77,19 @@ export default function App({ token }) {
         users={users} 
         token={token} 
         onUserUpdated={handleUserUpdated}
+      />
+
+          <ToastContainer
+          position='top-right'
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme='light'
       />
     </div>
   );

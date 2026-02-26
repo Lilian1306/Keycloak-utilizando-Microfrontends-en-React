@@ -31,6 +31,7 @@ export default function EditUserForm({ token, user, onSuccess, onCancel }) {
     const result = await updateUser(user.id, formData);
     if (result) {
       onSuccess();
+   
     }
   };
 
