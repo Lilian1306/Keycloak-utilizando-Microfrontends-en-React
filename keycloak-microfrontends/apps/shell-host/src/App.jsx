@@ -2,7 +2,11 @@ import { Suspense, lazy, useState } from "react";
 import keycloak from "../keycloak.js";
 
 const UserList = lazy(() => import('mfeUserList/UserList'));
-const UserForm = lazy(() => import('mfeUserForm/UserForm'));
+const UserForm = lazy(() => 
+  import('mfeUserForm/UserForm').catch(() => {
+    return { default: () => <div className="text-red-500 p-4">Error: No se pudo cargar el formulario de usuario</div> };
+  })
+);
 
 
 export default function App({token}) {
@@ -15,17 +19,7 @@ export default function App({token}) {
 
   const renderContent = () => {
     switch(currentView) {
-      case 'users':
-        return (
-          <Suspense fallback={
-            <div className="flex items-center justify-center h-64">
-              <div className="text-lg text-gray-600">Cargando lista de usuarios</div>
-            </div>
-          }>
-            <UserList token={token}/>
-          </Suspense>
-        )
-        case 'create-user':
+      case 'create-user':
           return (
             <Suspense fallback={ <div className="text-center p-10">Cargando Formulario</div> }>
             <UserForm
@@ -36,11 +30,22 @@ export default function App({token}) {
           )
           default: 
           return (
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h2 className="text-xl font-bold">Bienvenido</h2>
-              <p>Seleccione una opcion del menu para comenzar.</p>
+            <div className="bg-white p-6 rounded-lg shadow text-center">
+              <h2 className="text-4xl font-bold text-indigo-500">Bienvenido</h2>
+              <p className="text-2xl text-black">Seleccione una opcion del menu para comenzar.</p>
             </div>
           )
+      case 'users':
+        return (
+          <Suspense fallback={
+            <div className="flex items-center justify-center h-64">
+              <div className="text-lg text-gray-600">Cargando lista de usuarios</div>
+            </div>
+          }>
+            <UserList token={token}/>
+          </Suspense>
+        )
+        
        
     }
   }
@@ -67,7 +72,17 @@ export default function App({token}) {
       {/* Navigation */}
       <nav className="bg-white border-b border-gray-200">
         <div className="flex">
-          
+
+          <button 
+            onClick={() => setCurrentView('create-user')}
+            className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors duration-200 ${
+              currentView === 'create-user'
+                ? 'border-blue-500 text-blue-600 bg-blue-50'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+            }`}
+          >
+            Crear Usuario
+          </button>
           <button 
             onClick={() => setCurrentView('users')}
             className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors duration-200 ${
@@ -78,16 +93,7 @@ export default function App({token}) {
           >
             Listado de Usuarios
           </button>
-          <button 
-            onClick={() => setCurrentView('create-user')}
-            className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors duration-200 ${
-              currentView === 'create-user'
-                ? 'border-blue-500 text-blue-600 bg-blue-50'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-            }`}
-          >
-            Crear varios usuarios
-          </button>
+          
         </div>
       </nav>
 

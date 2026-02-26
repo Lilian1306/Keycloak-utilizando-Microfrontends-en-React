@@ -11,7 +11,7 @@ export default defineConfig({
       name: 'mfeUserForm',
       filename: 'remoteEntry.js',
       exposes: {
-        './App': './src/App.jsx',
+        './UserForm': './src/App.jsx',
       },
       shared: ['react', 'react-dom'],
     }),
