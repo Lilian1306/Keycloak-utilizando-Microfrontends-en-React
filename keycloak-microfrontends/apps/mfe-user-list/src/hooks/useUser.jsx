@@ -1,41 +1,128 @@
-import { useCallback, useState } from "react"
-import { KEYCLOAK_CONFIG} from '../config';
+import { useState } from 'react';
+import { KEYCLOAK_CONFIG } from '../config';
 
+export default function useUser({ token }) {
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null);
 
-export default function useUser({token}) {
-    const [users, setUsers] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const API_URL = KEYCLOAK_CONFIG.adminApiUrl; 
+    const getUserById = async (userId) => {
+        setIsLoading(true);
+        setError(null);
 
-    const fetchUsers = useCallback(async () => {
-        setLoading(true);
         try {
-            const response = await fetch(API_URL, {
-                headers: {Authorization: `Bearer ${token}`}
+            const response = await fetch(`${KEYCLOAK_CONFIG.adminApiUrl}/${userId}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                }
             });
-            const data = await response.json();
-            setUsers(data);
-        }catch(error) {
-            console.error("Error getching users:", error);
+
+            if (!response.ok) {
+                throw new Error(`Error fetching user: ${response.status}`);
+            }
+
+            const user = await response.json();
+            return user;
+        } catch (error) {
+            console.error("Error fetching user:", error);
+            setError(error.message);
+            return null;
         } finally {
-            setLoading(false);
+            setIsLoading(false);
         }
-    }, [token, API_URL]);
+    };
+
+
+    const updateUser = async (userId, userData) => {
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            const response = await fetch(`${KEYCLOAK_CONFIG.adminApiUrl}/${userId}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    id: userId,
+                    username: userData.username,
+                    email: userData.email,
+                    firstName: userData.firstName,
+                    lastName: userData.lastName,
+                    enabled: userData.enabled
+                })
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                let errorMessage = 'Error updating user';
+                
+                try {
+                    const errorData = JSON.parse(errorText);
+                    errorMessage = errorData.errorMessage || errorData.error || errorMessage;
+                } catch (e) {
+                    errorMessage = errorText || errorMessage;
+                }
+                
+                throw new Error(`${response.status}: ${errorMessage}`);
+            }
+
+            return true;
+        } catch (error) {
+            console.error("Error updating user:", error);
+            setError(error.message);
+            return false;
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
 
     const deleteUser = async (userId) => {
+        setIsLoading(true);
+        setError(null);
+
         try {
-            const response = await fetch(`${API_URL}/${userId}`, {
-                method: "DELETE",
-                headers: { Authorization: `Bearer ${token}`}
+            const response = await fetch(`${KEYCLOAK_CONFIG.adminApiUrl}/${userId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                }
             });
-            if( response.ok) {
-                setUsers(prev => prev.filter(u => u.id !== userId));
-                return true; 
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                let errorMessage = 'Error deleting user';
+                
+                try {
+                    const errorData = JSON.parse(errorText);
+                    errorMessage = errorData.errorMessage || errorData.error || errorMessage;
+                } catch (e) {
+                    errorMessage = errorText || errorMessage;
+                }
+                
+                throw new Error(`${response.status}: ${errorMessage}`);
             }
-        }catch(error){
+
+            return true;
+        } catch (error) {
             console.error("Error deleting user:", error);
+            setError(error.message);
             return false;
+        } finally {
+            setIsLoading(false);
         }
-    }
-    return { users, loading, fetchUsers, deleteUser };
+    };
+
+    return { 
+        getUserById,
+        updateUser,
+        deleteUser,
+        isLoading, 
+        error,
+        clearError: () => setError(null)
+    };
 }
