@@ -45,7 +45,7 @@ export default function useUsers({token}) {
                 throw new Error(`${response.status}: ${errorMessage}`);
             }
 
-            return true;
+        return true;
         } catch (error) {
             console.error("Error creating user:", error);
             setError(error.message);

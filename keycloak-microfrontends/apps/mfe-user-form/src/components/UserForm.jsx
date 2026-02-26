@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import useUsers from '../hooks/useUsers';
+import { toast } from 'react-toastify';
 
 const Initial_Form = {
     username: '',
@@ -11,25 +12,28 @@ const Initial_Form = {
 
 export default function UserForm({ token, onSucess }) {
   const [formData, setFormData] = useState(Initial_Form);
-
-  const [success, setSuccess] = useState('');
   const {createUser, isLoading, error, clearError} = useUsers({token});
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     clearError();
-    setSuccess('');
 
     const result = await createUser(formData);
     if(result) {
       setFormData(Initial_Form);
-      setSuccess('¡Usuario creado exitosamente en Keycloak!');
+      toast.success('¡Usuario creado exitosamente en Keycloak!');
 
       setTimeout(() => {
         onSucess();
       }, 2000);
     }
   };
+
+  useEffect(() => {
+    if(error) {
+      toast.error(`Error: ${error}`);
+    }
+  }, [error]);
 
   const handleChange = (e) => {
     setFormData({
@@ -45,18 +49,6 @@ export default function UserForm({ token, onSucess }) {
  return (
     <div className="bg-white p-6 rounded-lg shadow max-w-md mx-auto">
       <h3 className="text-lg font-medium mb-4">Crear Nuevo Usuario en Keycloak</h3>
-      
-      {error && (
-        <div className="mb-4 p-3 bg-red-100 border border-red-300 text-red-700 rounded">
-          <strong>Error:</strong> {error}
-        </div>
-      )}
-
-      {success && (
-        <div className="mb-4 p-3 bg-green-100 border border-green-300 text-green-700 rounded">
-          {success}
-        </div>
-      )}
 
       <form onSubmit={handleSubmit} className="space-y-4" >
         <div>
