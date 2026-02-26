@@ -1,14 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import useUsers from '../hooks/useUsers';
 
-export default function UserForm({ token, onSucess }) {
-  const [formData, setFormData] = useState({
+const Initial_Form = {
     username: '',
     email: '',
     firstName: '',
     lastName: '',
     password: ''
-  });
+};
+
+export default function UserForm({ token, onSucess }) {
+  const [formData, setFormData] = useState(Initial_Form);
 
   const [success, setSuccess] = useState('');
   const {createUser, isLoading, error, clearError} = useUsers({token});
@@ -20,14 +22,7 @@ export default function UserForm({ token, onSucess }) {
 
     const result = await createUser(formData);
     if(result) {
-      setFormData({
-        username: '',
-        email: '',
-        firstName: '',
-        lastName: '',
-        password: ''
-      });
-
+      setFormData(Initial_Form);
       setSuccess('¡Usuario creado exitosamente en Keycloak!');
 
       setTimeout(() => {
@@ -42,6 +37,10 @@ export default function UserForm({ token, onSucess }) {
       [e.target.name]: e.target.value
     });
   };
+
+  useEffect(() => {
+   setFormData(Initial_Form);
+  }, []);
 
  return (
     <div className="bg-white p-6 rounded-lg shadow max-w-md mx-auto">
@@ -59,7 +58,7 @@ export default function UserForm({ token, onSucess }) {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4" >
         <div>
           <label className="block text-sm font-medium text-gray-700">Usuario *</label>
           <input
