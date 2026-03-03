@@ -2,8 +2,7 @@ import { Suspense, lazy, useState } from "react";
 import keycloak from "../keycloak.js";
 
 const UserList = lazy(() => import('mfeUserList/UserList'));
-const UserForm = lazy(() => 
-  import('mfeUserForm/UserForm').catch(() => {
+const UserForm = lazy(() => import('mfeUserForm/UserForm').catch(() => {
     return { default: () => <div className="text-red-500 p-4">Error: No se pudo cargar el formulario de usuario</div> };
   })
 );
@@ -51,7 +50,6 @@ export default function App({token}) {
   }
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      {/* Header */}
       <header className="bg-gray-800 text-white shadow-lg">
         <div className="px-6 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold">Keycloak User Management</h1>
@@ -69,7 +67,6 @@ export default function App({token}) {
         </div>
       </header>
       
-      {/* Navigation */}
       <nav className="bg-white border-b border-gray-200">
         <div className="flex">
 
