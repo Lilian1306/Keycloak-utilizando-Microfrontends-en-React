@@ -2,16 +2,16 @@ import { useState, useEffect } from 'react';
 import useUsers from '../hooks/useUsers';
 import { toast } from 'react-toastify';
 
-const Initial_Form = {
+const getInitialForm = () => ({
     username: '',
     email: '',
     firstName: '',
     lastName: '',
     password: ''
-};
+});
 
 export default function UserForm({ token, onSucess }) {
-  const [formData, setFormData] = useState(Initial_Form);
+  const [formData, setFormData] = useState(() => getInitialForm());
   const {createUser, isLoading, error, clearError} = useUsers({token});
 
   const handleSubmit = async (e) => {
@@ -20,7 +20,7 @@ export default function UserForm({ token, onSucess }) {
 
     const result = await createUser(formData);
     if(result) {
-      setFormData(Initial_Form);
+      setFormData(getInitialForm());
       toast.success('¡Usuario creado exitosamente en Keycloak!');
 
       setTimeout(() => {
@@ -42,8 +42,13 @@ export default function UserForm({ token, onSucess }) {
     });
   };
 
+  const resetForm = () => {
+    setFormData(getInitialForm());
+    clearError();
+  };
+
   useEffect(() => {
-   setFormData(Initial_Form);
+    resetForm();
   }, []);
 
  return (
@@ -123,7 +128,10 @@ export default function UserForm({ token, onSucess }) {
         <div className="flex justify-between pt-4">
           <button
             type="button"
-            onClick={() => onSucess()}
+            onClick={() => {
+              resetForm();
+              onSucess();
+            }}
             disabled={isLoading}
             className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 disabled:opacity-50"
           >
